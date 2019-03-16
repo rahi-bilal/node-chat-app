@@ -6,6 +6,8 @@ const http= require('http');
 const express= require('express');
 const socketIO= require('socket.io');
 
+//importing in app modules
+var {generateMessage}= require('./utils/message');
 
 var publicPath= path.join(__dirname, '../public');
 var port= process.env.PORT || 3000;
@@ -15,29 +17,17 @@ var io= socketIO(server);
 
 io.on('connection', (socket)=> {
     console.log('New User Connected');
-    
     //Send welcome message from io to connected socket
-    socket.emit('newMessage', {
-        from: 'admin',
-        text: 'Welcome to the chat app',
-        createdAt: new Date().getTime()
-    });
+    socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
 
     //Broadcast to every other socket connected to io that some other socket is connected
-    socket.broadcast.emit('newMessage', {
-        from: 'admin',
-        text: 'New User joined chat',
-        createdAt: new Date().getTime()
-    });
+    socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined chat.'));
     
     // Event handler when connected socket emit 'createMessage' event
-    socket.on('createMessage', (message)=> {
+    socket.on('createMessage', (message, callback)=> {
+        callback({from: 'IO', text: 'Message Received.'});
         //io.emit for broadcasting message to every connected socket to io
-        io.emit('newMessage', {
-            from: message.from,
-            text: message.text,
-            createdAt: new Date().getTime()
-        });
+        io.emit('newMessage', generateMessage(message.from, message.text));
     });
 
     socket.on('disconnect', (socket)=> {
