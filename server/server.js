@@ -15,10 +15,21 @@ var io= socketIO(server);
 
 io.on('connection', (socket)=> {
     console.log('New User Connected');
-
+    
     socket.on('disconnect', (socket)=> {
         console.log('User Disconnected');
     });
+
+    socket.on('createMessage', (message)=> {
+        console.log('createMessage: ', message);
+    });
+
+    socket.emit('newMessage', {
+        from: 'Rahi Bilal',
+        text: 'Hey Shubh! how are you doing.',
+        createdAt: new Date()
+    });
+
 });
 
 
