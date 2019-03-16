@@ -20,15 +20,17 @@ io.on('connection', (socket)=> {
         console.log('User Disconnected');
     });
 
+    // Event handler when connected socket emit 'createMessage' event
     socket.on('createMessage', (message)=> {
-        console.log('createMessage: ', message);
+        //io.emit for broadcasting message to every connected socket to io
+        io.emit('newMessage', {
+            from: message.from,
+            text: message.text,
+            createdAt: new Date().getTime()
+        });
     });
 
-    socket.emit('newMessage', {
-        from: 'Rahi Bilal',
-        text: 'Hey Shubh! how are you doing.',
-        createdAt: new Date()
-    });
+
 
 });
 
