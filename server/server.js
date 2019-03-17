@@ -7,7 +7,7 @@ const express= require('express');
 const socketIO= require('socket.io');
 
 //importing in app modules
-var {generateMessage}= require('./utils/message');
+var {generateMessage, generateLocationMessage}= require('./utils/message');
 
 var publicPath= path.join(__dirname, '../public');
 var port= process.env.PORT || 3000;
@@ -25,9 +25,14 @@ io.on('connection', (socket)=> {
     
     // Event handler when connected socket emit 'createMessage' event
     socket.on('createMessage', (message, callback)=> {
-        callback({from: 'IO', text: 'Message Received.'});
         //io.emit for broadcasting message to every connected socket to io
         io.emit('newMessage', generateMessage(message.from, message.text));
+        callback();
+    });
+
+    socket.on('createLocationMessage', (coords)=> {
+        console.log(coords);
+        io.emit('newLocationMessage', generateLocationMessage("User", coords.latitude, coords.longitude));
     });
 
     socket.on('disconnect', (socket)=> {
